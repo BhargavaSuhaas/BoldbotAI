@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BoldBot AI — Voice Workspace</title>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #6366f1;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+    /* Navigation Sidebar */
+    .sidebar { width: 240px; background: #020617; border-right: 1px solid var(--border-color); padding: 20px 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex-shrink: 0; }
+    .brand { font-size: 1.25rem; font-weight: bold; color: var(--accent); padding: 10px; margin-bottom: 10px; }
+    .nav-link { color: var(--text-muted); text-decoration: none; padding: 10px 14px; border-radius: 8px; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+    .nav-link:hover, .nav-link.active { background: var(--card-bg); color: var(--text-main); }
+
+    /* Main Area */
+    .main-content { flex: 1; padding: 30px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
+    .header { border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+
+    /* Voice Interface */
+    .voice-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; }
+    .mic-button { width: 90px; height: 90px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 2.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
+    .mic-button.listening { background: #ef4444; box-shadow: 0 0 25px rgba(239, 68, 68, 0.7); animation: pulse 1.5s infinite; }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    .status-text { font-size: 1rem; color: var(--text-muted); }
+    .transcript-box { width: 100%; max-width: 700px; background: #0f172a; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; min-height: 80px; text-align: left; font-size: 0.95rem; }
+    .response-box { width: 100%; max-width: 700px; background: #0f172a; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; min-height: 120px; text-align: left; font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; color: #38bdf8; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Sidebar -->
+  <nav class="sidebar">
+    <div class="brand">BoldBot AI</div>
+    <a href="index.html" class="nav-link">🏠 Home</a>
+    <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+    <a href="chat.html" class="nav-link">💬 Chat</a>
+    <a href="voice.html" class="nav-link active">🎙 Voice</a>
+    <a href="tts.html" class="nav-link">🔊 TTS</a>
+    <a href="document-drafting.html" class="nav-link">📝 Document Drafting</a>
+    <a href="document-analysis.html" class="nav-link">📄 Document Analysis</a>
+    <a href="spreadsheet-analysis.html" class="nav-link">📊 Spreadsheet Analysis</a>
+    <a href="research.html" class="nav-link">🔬 Research</a>
+    <a href="coding-assistant.html" class="nav-link">💻 Coding Assistant</a>
+    <a href="image-studio.html" class="nav-link">🎨 Image Studio</a>
+    <a href="planning-assistant.html" class="nav-link">📅 Planning Assistant</a>
+    <a href="deep-thinking.html" class="nav-link">🧠 Deep Thinking</a>
+    <a href="assets.html" class="nav-link">📁 Assets</a>
+    <a href="settings.html" class="nav-link">⚙️ Settings</a>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="header">
+      <h1>🎙 Interactive Voice Assistant</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 5px;">
+        Speak directly to BoldBot AI using voice synthesis and real-time audio playback.
+      </p>
+    </header>
+
+    <div class="voice-container">
+      <button id="micBtn" class="mic-button" onclick="toggleListening()">🎙</button>
+      <div id="statusText" class="status-text">Click the microphone to start speaking...</div>
+
+      <div style="width: 100%; max-width: 700px; text-align: left;">
+        <label style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Speech Transcript</label>
+        <div id="transcript" class="transcript-box">Listening output will display here...</div>
+      </div>
+
+      <div style="width: 100%; max-width: 700px; text-align: left;">
+        <label style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">AI Spoken Response</label>
+        <div id="response" class="response-box">AI spoken reply text will appear here...</div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isListening = false;
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        isListening = true;
+        document.getElementById('micBtn').classList.add('listening');
+        document.getElementById('statusText').textContent = "Listening... Speak now.";
+      };
+
+      recognition.onresult = async (e) => {
+        const text = e.results[0][0].transcript;
+        document.getElementById('transcript').textContent = text;
+        document.getElementById('statusText').textContent = "Processing speech with AI...";
+        await processVoiceInput(text);
+      };
+
+      recognition.onerror = () => {
+        stopListening();
+        document.getElementById('statusText').textContent = "Voice input error. Click mic to retry.";
+      };
+
+      recognition.onend = () => {
+        stopListening();
+      };
+    } else {
+      document.getElementById('statusText').textContent = "Web Speech API is not supported in this browser.";
+      document.getElementById('micBtn').disabled = true;
+    }
+
+    function toggleListening() {
+      if (!recognition) return;
+      if (isListening) {
+        recognition.stop();
+      } else {
+        recognition.start();
+      }
+    }
+
+    function stopListening() {
+      isListening = false;
+      document.getElementById('micBtn').classList.remove('listening');
+    }
+
+    async function processVoiceInput(userText) {
+      const responseBox = document.getElementById('response');
+      responseBox.textContent = "Synthesizing AI response...";
+
+      try {
+        const res = await fetch('https://text.pollinations.ai/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [
+              { role: "system", content: "You are a concise, helpful voice assistant. Keep answers brief and natural for spoken audio." },
+              { role: "user", content: userText }
+            ],
+            model: 'openai'
+          })
+        });
+
+        const reply = await res.text();
+        responseBox.textContent = reply;
+        speakText(reply);
+        document.getElementById('statusText').textContent = "Click microphone to speak again.";
+      } catch (err) {
+        responseBox.textContent = "Error processing voice command.";
+        document.getElementById('statusText').textContent = "Error encountered.";
+      }
+    }
+
+    function speakText(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+  </script>
+</body>
+</html>

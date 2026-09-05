@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>BoldBot AI — Chat Workspace</title>
+
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --sidebar-bg: #020617;
+      --card-bg: #1e293b;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --danger: #ef4444;
+      --success: #22c55e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      background: var(--bg-dark);
+      color: var(--text-main);
+
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* =========================
+       SIDEBAR
+    ========================= */
+
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border-color);
+
+      padding: 20px 10px;
+
+      display: flex;
+      flex-direction: column;
+
+      gap: 6px;
+
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      font-size: 1.3rem;
+      font-weight: 800;
+
+      color: var(--accent);
+
+      padding: 10px 14px;
+      margin-bottom: 10px;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+
+      padding: 11px 14px;
+
+      border-radius: 8px;
+
+      font-size: 0.94rem;
+
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .nav-link:hover {
+      background: var(--card-bg);
+      color: var(--text-main);
+      transform: translateX(2px);
+    }
+
+    .nav-link.active {
+      background: var(--card-bg);
+      color: var(--text-main);
+    }
+
+    /* =========================
+       MAIN CONTENT
+    ========================= */
+
+    .main-content {
+      flex: 1;
+      min-width: 0;
+
+      height: 100vh;
+
+      padding: 30px;
+
+      display: flex;
+      flex-direction: column;
+
+      gap: 20px;
+
+      overflow: hidden;
+    }
+
+    .header {
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 15px;
+
+      flex-shrink: 0;
+    }
+
+    .header h1 {
+      font-size: 1.7rem;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 5px;
+    }
+
+    /* =========================
+       CHAT
+    ========================= */
+
+    .chat-container {
+      flex: 1;
+      min-height: 0;
+
+      background: var(--card-bg);
+
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+
+      display: flex;
+      flex-direction: column;
+
+      overflow: hidden;
+
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .chat-messages {
+      flex: 1;
+      min-height: 0;
+
+      padding: 20px;
+
+      overflow-y: auto;
+
+      display: flex;
+      flex-direction: column;
+
+      gap: 15px;
+
+      scroll-behavior: smooth;
+    }
+
+    /* Scrollbar */
+
+    .chat-messages::-webkit-scrollbar,
+    .sidebar::-webkit-scrollbar {
+      width: 7px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track,
+    .sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb,
+    .sidebar::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 20px;
+    }
+
+    /* =========================
+       MESSAGES
+    ========================= */
+
+    .message {
+      max-width: 80%;
+
+      padding: 12px 16px;
+
+      border-radius: 10px;
+
+      font-size: 0.95rem;
+      line-height: 1.55;
+
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+
+      animation: messageIn 0.2s ease;
+    }
+
+    @keyframes messageIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message.user {
+      background: var(--accent);
+      color: white;
+
+      align-self: flex-end;
+
+      border-bottom-right-radius: 2px;
+    }
+
+    .message.bot {
+      background: #0f172a;
+
+      border: 1px solid var(--border-color);
+
+      color: var(--text-main);
+
+      align-self: flex-start;
+
+      border-bottom-left-radius: 2px;
+    }
+
+    .message.error {
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #fecaca;
+    }
+
+    .thinking {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* =========================
+       INPUT AREA
+    ========================= */
+
+    .chat-input-area {
+      padding: 15px;
+
+      border-top: 1px solid var(--border-color);
+
+      display: flex;
+      gap: 10px;
+
+      background: var(--sidebar-bg);
+
+      flex-shrink: 0;
+    }
+
+    #userInput {
+      flex: 1;
+      min-width: 0;
+
+      background: var(--bg-dark);
+
+      border: 1px solid var(--border-color);
+
+      color: var(--text-main);
+
+      padding: 12px;
+
+      border-radius: 6px;
+
+      font-size: 0.95rem;
+
+      outline: none;
+
+      transition: border-color 0.2s ease;
+    }
+
+    #userInput::placeholder {
+      color: #64748b;
+    }
+
+    #userInput:focus {
+      border-color: var(--accent);
+    }
+
+    #userInput:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* =========================
+       BUTTON
+    ========================= */
+
+    .btn {
+      background: var(--accent);
+      color: white;
+
+      border: none;
+
+      padding: 12px 20px;
+
+      border-radius: 6px;
+
+      font-weight: 600;
+
+      cursor: pointer;
+
+      transition:
+        background 0.2s ease,
+        opacity 0.2s ease,
+        transform 0.1s ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: var(--accent-hover);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* =========================
+       STATUS
+    ========================= */
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+
+      margin-top: 8px;
+
+      color: var(--text-muted);
+
+      font-size: 0.8rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+
+      border-radius: 50%;
+
+      background: var(--success);
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 800px) {
+      .sidebar {
+        width: 190px;
+      }
+
+      .main-content {
+        padding: 18px;
+      }
+
+      .message {
+        max-width: 90%;
+      }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        display: block;
+        overflow: auto;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+
+        max-height: 220px;
+
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .main-content {
+        height: calc(100vh - 220px);
+        padding: 15px;
+      }
+
+      .header h1 {
+        font-size: 1.35rem;
+      }
+
+      .chat-input-area {
+        padding: 10px;
+      }
+
+      .btn {
+        padding: 12px 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================
+       NAVIGATION
+  ========================== -->
+
+  <nav class="sidebar">
+
+    <div class="brand">
+      BoldBot AI
+    </div>
+
+    <a href="index.html" class="nav-link">
+      🏠 Home
+    </a>
+
+    <a href="dashboard.html" class="nav-link">
+      📊 Dashboard
+    </a>
+
+    <a href="chat.html" class="nav-link active">
+      💬 Chat
+    </a>
+
+    <a href="voice.html" class="nav-link">
+      🎙 Voice
+    </a>
+
+    <a href="tts.html" class="nav-link">
+      🔊 TTS
+    </a>
+
+    <a href="document-drafting.html" class="nav-link">
+      📝 Document Drafting
+    </a>
+
+    <a href="document-analysis.html" class="nav-link">
+      📄 Document Analysis
+    </a>
+
+    <a href="spreadsheet-analysis.html" class="nav-link">
+      📊 Spreadsheet Analysis
+    </a>
+
+    <a href="research.html" class="nav-link">
+      🔬 Research
+    </a>
+
+    <a href="coding-assistant.html" class="nav-link">
+      💻 Coding Assistant
+    </a>
+
+    <a href="image-studio.html" class="nav-link">
+      🎨 Image Studio
+    </a>
+
+    <a href="planning-assistant.html" class="nav-link">
+      📅 Planning Assistant
+    </a>
+
+    <a href="deep-thinking.html" class="nav-link">
+      🧠 Deep Thinking
+    </a>
+
+    <a href="assets.html" class="nav-link">
+      📁 Assets
+    </a>
+
+    <a href="settings.html" class="nav-link">
+      ⚙️ Settings
+    </a>
+
+  </nav>
+
+
+  <!-- =========================
+       MAIN
+  ========================== -->
+
+  <main class="main-content">
+
+    <header class="header">
+
+      <h1>
+        💬 Conversational AI Chat
+      </h1>
+
+      <p>
+        Direct real-time conversation interface powered by Puter AI (Free & Fast).
+      </p>
+
+      <div class="status">
+        <span class="status-dot"></span>
+        <span id="statusText">Ready</span>
+      </div>
+
+    </header>
+
+
+    <!-- =========================
+          CHAT CONTAINER
+    ========================== -->
+
+    <section class="chat-container">
+
+      <div
+        id="chatMessages"
+        class="chat-messages"
+        aria-live="polite"
+        aria-label="Chat messages"
+      >
+
+        <div class="message bot">
+          Hello! I am BoldBot AI. How can I assist you today?
+        </div>
+
+      </div>
+
+
+      <!-- =========================
+            INPUT
+      ========================== -->
+
+      <form
+        id="chatForm"
+        class="chat-input-area"
+      >
+
+        <input
+          type="text"
+          id="userInput"
+          placeholder="Type your message here..."
+          autocomplete="off"
+          maxlength="4000"
+          aria-label="Message"
+        >
+
+        <button
+          type="submit"
+          class="btn"
+          id="sendBtn"
+        >
+          Send
+        </button>
+
+      </form>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       JAVASCRIPT - Puter AI
+  ========================== -->
+
+  <script>
+
+    "use strict";
+
+    /*
+     * Conversation history.
+     */
+    const conversationHistory = [
+      {
+        role: "system",
+        content:
+          "You are BoldBot AI, a helpful, polite, intelligent, and concise AI assistant. Keep responses brief and friendly."
+      }
+    ];
+
+
+    /*
+     * DOM elements.
+     */
+    const chatForm = document.getElementById("chatForm");
+    const userInput = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const messagesContainer = document.getElementById("chatMessages");
+    const statusText = document.getElementById("statusText");
+
+
+    /*
+     * Update status text.
+     */
+    function setStatus(text) {
+      statusText.textContent = text;
+    }
+
+
+    /*
+     * Scroll chat to the latest message.
+     */
+    function scrollToBottom() {
+      requestAnimationFrame(() => {
+        messagesContainer.scrollTop =
+          messagesContainer.scrollHeight;
+      });
+    }
+
+
+    /*
+     * Add a message to the chat.
+     */
+    function appendMessage(text, sender, extraClass = "") {
+
+      const messageDiv =
+        document.createElement("div");
+
+      messageDiv.className =
+        `message ${sender} ${extraClass}`.trim();
+
+      messageDiv.textContent = text;
+
+      messagesContainer.appendChild(messageDiv);
+
+      scrollToBottom();
+
+      return messageDiv;
+    }
+
+
+    /*
+     * Enable/disable chat controls.
+     */
+    function setLoading(isLoading) {
+
+      userInput.disabled = isLoading;
+      sendBtn.disabled = isLoading;
+
+      if (isLoading) {
+        sendBtn.textContent = "Sending...";
+        setStatus("Generating response...");
+      } else {
+        sendBtn.textContent = "Send";
+        setStatus("Ready");
+      }
+    }
+
+
+    /*
+     * Send a message using Puter AI API
+     */
+    async function sendMessage() {
+
+      const text = userInput.value.trim();
+
+      if (!text) {
+        userInput.focus();
+        return;
+      }
+
+      /*
+       * Prevent duplicate requests.
+       */
+      if (sendBtn.disabled) {
+        return;
+      }
+
+
+      /*
+       * Display user message.
+       */
+      appendMessage(text, "user");
+
+
+      /*
+       * Add user message to history.
+       */
+      conversationHistory.push({
+        role: "user",
+        content: text
+      });
+
+
+      /*
+       * Clear input.
+       */
+      userInput.value = "";
+
+
+      /*
+       * Create temporary bot message.
+       */
+      const botMessage =
+        appendMessage(
+          "Thinking...",
+          "bot",
+          "thinking"
+        );
+
+
+      /*
+       * Disable controls.
+       */
+      setLoading(true);
+
+
+      try {
+
+        /*
+         * Send request to Puter AI API
+         * Free, no authentication required
+         */
+        const response = await fetch(
+          "https://api.puter.com/ai/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              messages: conversationHistory,
+              model: "gpt-4o-mini",
+              temperature: 0.7,
+              max_tokens: 1024,
+            }),
+          }
+        );
+
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+
+        const data = await response.json();
+        const reply = data?.choices?.[0]?.message?.content?.trim();
+
+
+        if (!reply) {
+          throw new Error("Empty response from API");
+        }
+
+
+        botMessage.classList.remove("thinking");
+        botMessage.textContent = reply;
+
+
+        conversationHistory.push({
+          role: "assistant",
+          content: reply
+        });
+
+
+        setStatus("Ready");
+
+      } catch (error) {
+
+        console.error("Chat error:", error);
+
+        botMessage.classList.remove("thinking");
+        botMessage.classList.add("error");
+        botMessage.textContent =
+          `Error: ${error.message}\n\n` +
+          "Please check your internet connection and try again.";
+
+        setStatus("Error");
+
+      } finally {
+
+        setLoading(false);
+        userInput.focus();
+        scrollToBottom();
+
+      }
+    }
+
+
+    /*
+     * Form submit handler.
+     */
+    chatForm.addEventListener(
+      "submit",
+      function (event) {
+
+        event.preventDefault();
+
+        sendMessage();
+
+      }
+    );
+
+
+    /*
+     * Initial focus.
+     */
+    window.addEventListener(
+      "load",
+      () => {
+        userInput.focus();
+        scrollToBottom();
+      }
+    );
+
+  </script>
+
+</body>
+</html>

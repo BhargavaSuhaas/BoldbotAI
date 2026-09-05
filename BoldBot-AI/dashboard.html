@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BoldBot AI — Dashboard</title>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #6366f1;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+    /* Navigation Sidebar */
+    .sidebar { width: 240px; background: #020617; border-right: 1px solid var(--border-color); padding: 20px 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+    .brand { font-size: 1.25rem; font-weight: bold; color: var(--accent); padding: 10px; margin-bottom: 10px; }
+    .nav-link { color: var(--text-muted); text-decoration: none; padding: 10px 14px; border-radius: 8px; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+    .nav-link:hover, .nav-link.active { background: var(--card-bg); color: var(--text-main); }
+
+    /* Main Area */
+    .main-content { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 25px; }
+    .header { border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+
+    /* Metric Cards Grid */
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+    .metric-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .metric-title { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .metric-value { font-size: 2rem; font-weight: bold; color: var(--accent); }
+
+    /* Activity Breakdown Grid */
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .panel { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+    .panel h3 { font-size: 1.1rem; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
+
+    .stat-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .stat-item { display: flex; justify-content: space-between; font-size: 0.95rem; }
+    .stat-label { color: var(--text-muted); }
+    .stat-count { font-weight: 600; color: var(--text-main); }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Sidebar -->
+  <nav class="sidebar">
+    <div class="brand">BoldBot AI</div>
+    <a href="index.html" class="nav-link">🏠 Home</a>
+    <a href="dashboard.html" class="nav-link active">📊 Dashboard</a>
+    <a href="chat.html" class="nav-link">💬 Chat</a>
+    <a href="voice.html" class="nav-link">🎙 Voice</a>
+    <a href="tts.html" class="nav-link">🔊 TTS</a>
+    <a href="document-drafting.html" class="nav-link">📝 Document Drafting</a>
+    <a href="document-analysis.html" class="nav-link">📄 Document Analysis</a>
+    <a href="spreadsheet-analysis.html" class="nav-link">📊 Spreadsheet Analysis</a>
+    <a href="research.html" class="nav-link">🔬 Research</a>
+    <a href="coding-assistant.html" class="nav-link">💻 Coding Assistant</a>
+    <a href="image-studio.html" class="nav-link">🎨 Image Studio</a>
+    <a href="planning-assistant.html" class="nav-link">📅 Planning Assistant</a>
+    <a href="deep-thinking.html" class="nav-link">🧠 Deep Thinking</a>
+    <a href="assets.html" class="nav-link">📁 Assets</a>
+    <a href="settings.html" class="nav-link">⚙️ Settings</a>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="header">
+      <h1>📊 Activity & Analytics Dashboard</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 5px;">
+        Overview of system activity, saved assets, and task statuses across workspaces[cite: 1].
+      </p>
+    </header>
+
+    <!-- Top Key Metrics -->
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <span class="metric-title">Total Conversations</span>
+        <span class="metric-value" id="totalChats">0</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-title">Saved Assets</span>
+        <span class="metric-value" id="totalAssets">0</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-title">Generated Images</span>
+        <span class="metric-value" id="totalImages">0</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-title">Documents Created</span>
+        <span class="metric-value" id="totalDocs">0</span>
+      </div>
+    </section>
+
+    <!-- Detailed Categorized Breakdown -->
+    <section class="dashboard-grid">
+      <!-- Activity Summary -->
+      <div class="panel">
+        <h3>Activity Breakdown</h3>
+        <ul class="stat-list">
+          <li class="stat-item"><span class="stat-label">Chat Conversations</span><span class="stat-count" id="countChat">0</span></li>
+          <li class="stat-item"><span class="stat-label">Voice Conversations</span><span class="stat-count" id="countVoice">0</span></li>
+          <li class="stat-item"><span class="stat-label">Document Drafts</span><span class="stat-count" id="countDrafts">0</span></li>
+          <li class="stat-item"><span class="stat-label">Document Analyses</span><span class="stat-count" id="countDocAnalysis">0</span></li>
+          <li class="stat-item"><span class="stat-label">Spreadsheet Analyses</span><span class="stat-count" id="countSheets">0</span></li>
+          <li class="stat-item"><span class="stat-label">Research Reports</span><span class="stat-count" id="countResearch">0</span></li>
+        </ul>
+      </div>
+
+      <!-- Assets Summary -->
+      <div class="panel">
+        <h3>Assets Library Stats</h3>
+        <ul class="stat-list">
+          <li class="stat-item"><span class="stat-label">Images</span><span class="stat-count" id="assetImages">0</span></li>
+          <li class="stat-item"><span class="stat-label">Text & Reports</span><span class="stat-count" id="assetDocs">0</span></li>
+          <li class="stat-item"><span class="stat-label">Audio & Voice Clips</span><span class="stat-count" id="assetAudio">0</span></li>
+          <li class="stat-item"><span class="stat-label">Plans & Projects</span><span class="stat-count" id="assetPlans">0</span></li>
+          <li class="stat-item"><span class="stat-label">Deep Thinking Solutions</span><span class="stat-count" id="assetThinking">0</span></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Embedded Storage Controller for BoldBot AI Dashboard
+    class BoldBotDB {
+      constructor() {
+        this.dbName = 'BoldBotAI_DB';
+        this.version = 1;
+        this.db = null;
+      }
+
+      async init() {
+        return new Promise((resolve, reject) => {
+          const request = indexedDB.open(this.dbName, this.version);
+          request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains('chats')) db.createObjectStore('chats', { keyPath: 'id' });
+            if (!db.objectStoreNames.contains('assets')) db.createObjectStore('assets', { keyPath: 'id' });
+            if (!db.objectStoreNames.contains('settings')) db.createObjectStore('settings', { keyPath: 'key' });
+          };
+          request.onsuccess = (event) => {
+            this.db = event.target.result;
+            resolve(this.db);
+          };
+          request.onerror = (event) => reject(event.target.error);
+        });
+      }
+
+      async getAllData(storeName) {
+        return new Promise((resolve) => {
+          if (!this.db) return resolve([]);
+          const tx = this.db.transaction(storeName, 'readonly');
+          const store = tx.objectStore(storeName);
+          const req = store.getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => resolve([]);
+        });
+      }
+    }
+
+    // Load Metrics Live
+    const db = new BoldBotDB();
+    db.init().then(async () => {
+      const chats = await db.getAllData('chats');
+      const assets = await db.getAllData('assets');
+
+      // Counts by Asset Type
+      const images = assets.filter(a => a.type === 'image').length;
+      const docs = assets.filter(a => a.type === 'document' || a.type === 'research').length;
+      const audio = assets.filter(a => a.type === 'audio').length;
+      const plans = assets.filter(a => a.type === 'plan').length;
+      const thinking = assets.filter(a => a.type === 'thinking').length;
+
+      // Update Key Metrics
+      document.getElementById('totalChats').textContent = chats.length;
+      document.getElementById('totalAssets').textContent = assets.length;
+      document.getElementById('totalImages').textContent = images;
+      document.getElementById('totalDocs').textContent = docs;
+
+      // Update Stat Lists
+      document.getElementById('countChat').textContent = chats.filter(c => !c.type || c.type === 'chat').length;
+      document.getElementById('countVoice').textContent = chats.filter(c => c.type === 'voice').length;
+      document.getElementById('countDrafts').textContent = assets.filter(a => a.type === 'draft').length;
+      document.getElementById('countDocAnalysis').textContent = assets.filter(a => a.type === 'doc_analysis').length;
+      document.getElementById('countSheets').textContent = assets.filter(a => a.type === 'spreadsheet').length;
+      document.getElementById('countResearch').textContent = assets.filter(a => a.type === 'research').length;
+
+      document.getElementById('assetImages').textContent = images;
+      document.getElementById('assetDocs').textContent = docs;
+      document.getElementById('assetAudio').textContent = audio;
+      document.getElementById('assetPlans').textContent = plans;
+      document.getElementById('assetThinking').textContent = thinking;
+    });
+  </script>
+</body>
+</html>

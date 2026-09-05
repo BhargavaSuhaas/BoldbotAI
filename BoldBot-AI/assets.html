@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BoldBot AI — Assets Library</title>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #6366f1;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+    /* Navigation Sidebar */
+    .sidebar { width: 240px; background: #020617; border-right: 1px solid var(--border-color); padding: 20px 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex-shrink: 0; }
+    .brand { font-size: 1.25rem; font-weight: bold; color: var(--accent); padding: 10px; margin-bottom: 10px; }
+    .nav-link { color: var(--text-muted); text-decoration: none; padding: 10px 14px; border-radius: 8px; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+    .nav-link:hover, .nav-link.active { background: var(--card-bg); color: var(--text-main); }
+
+    /* Main Area */
+    .main-content { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+    .header { border-bottom: 1px solid var(--border-color); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+
+    /* Controls Header */
+    .filter-bar { display: flex; gap: 10px; align-items: center; }
+    select, input { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 12px; border-radius: 6px; font-size: 0.9rem; }
+
+    /* Grid Layout */
+    .assets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; flex: 1; }
+    .asset-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px; position: relative; transition: 0.2s; }
+    .asset-card:hover { border-color: var(--accent); }
+
+    .asset-type-badge { font-size: 0.75rem; font-weight: bold; text-transform: uppercase; color: var(--accent); background: rgba(99, 102, 241, 0.15); padding: 4px 8px; border-radius: 4px; align-self: flex-start; }
+    .asset-title { font-weight: 600; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .asset-date { font-size: 0.8rem; color: var(--text-muted); }
+    
+    .card-actions { display: flex; gap: 8px; margin-top: auto; pt: 10px; }
+    .btn { background: var(--accent); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.2s; flex: 1; text-align: center; }
+    .btn-danger { background: #ef4444; flex: 0; }
+    .btn:hover { opacity: 0.9; }
+
+    /* Viewer Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+    .modal-content { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; width: 100%; max-width: 700px; max-height: 80vh; display: flex; flex-direction: column; gap: 15px; padding: 20px; }
+    .modal-body { background: #0f172a; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; font-size: 0.9rem; line-height: 1.6; overflow-y: auto; flex: 1; white-space: pre-wrap; font-family: inherit; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Sidebar -->
+  <nav class="sidebar">
+    <div class="brand">BoldBot AI</div>
+    <a href="index.html" class="nav-link">🏠 Home</a>
+    <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+    <a href="chat.html" class="nav-link">💬 Chat</a>
+    <a href="voice.html" class="nav-link">🎙 Voice</a>
+    <a href="tts.html" class="nav-link">🔊 TTS</a>
+    <a href="document-drafting.html" class="nav-link">📝 Document Drafting</a>
+    <a href="document-analysis.html" class="nav-link">📄 Document Analysis</a>
+    <a href="spreadsheet-analysis.html" class="nav-link">📊 Spreadsheet Analysis</a>
+    <a href="research.html" class="nav-link">🔬 Research</a>
+    <a href="coding-assistant.html" class="nav-link">💻 Coding Assistant</a>
+    <a href="image-studio.html" class="nav-link">🎨 Image Studio</a>
+    <a href="planning-assistant.html" class="nav-link">📅 Planning Assistant</a>
+    <a href="deep-thinking.html" class="nav-link">🧠 Deep Thinking</a>
+    <a href="assets.html" class="nav-link active">📁 Assets</a>
+    <a href="settings.html" class="nav-link">⚙️ Settings</a>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="header">
+      <div>
+        <h1>📁 Central Assets Library</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 5px;">
+          Manage, view, and export all local documents, code snippets, research, and artwork[cite: 1].
+        </p>
+      </div>
+
+      <div class="filter-bar">
+        <select id="typeFilter" onchange="filterAssets()">
+          <option value="ALL">All Categories</option>
+          <option value="document">Documents</option>
+          <option value="research_report">Research</option>
+          <option value="sheet_analysis">Spreadsheets</option>
+          <option value="code">Code Snippets</option>
+          <option value="image">Generated Artwork</option>
+          <option value="roadmap">Plans & Schedules</option>
+          <option value="deep_thinking">Deep Thinking</option>
+        </select>
+        <button class="btn btn-danger" style="padding: 8px 12px;" onclick="clearAllAssets()">🗑 Clear All</button>
+      </div>
+    </header>
+
+    <div id="assetsContainer" class="assets-grid">
+      <!-- Dynamic Asset Cards Render Here -->
+    </div>
+  </main>
+
+  <!-- Content Viewer Modal -->
+  <div id="viewModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 id="modalTitle">Asset Details</h3>
+        <button class="btn btn-danger" style="padding: 4px 8px;" onclick="closeModal()">✕</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="btn" id="downloadBtn">💾 Download Content</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class BoldBotDB {
+      constructor() {
+        this.dbName = 'BoldBotAI_DB';
+        this.version = 1;
+        this.db = null;
+      }
+      async init() {
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(this.dbName, this.version);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('assets')) db.createObjectStore('assets', { keyPath: 'id' });
+          };
+          req.onsuccess = (e) => { this.db = e.target.result; resolve(this.db); };
+          req.onerror = (e) => reject(e.target.error);
+        });
+      }
+      async getAllAssets() {
+        if (!this.db) return [];
+        return new Promise((resolve) => {
+          const tx = this.db.transaction('assets', 'readonly');
+          const req = tx.objectStore('assets').getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => resolve([]);
+        });
+      }
+      async deleteAsset(id) {
+        if (!this.db) return;
+        const tx = this.db.transaction('assets', 'readwrite');
+        return tx.objectStore('assets').delete(id);
+      }
+      async clearAssets() {
+        if (!this.db) return;
+        const tx = this.db.transaction('assets', 'readwrite');
+        return tx.objectStore('assets').clear();
+      }
+    }
+
+    const db = new BoldBotDB();
+    let allAssets = [];
+
+    async function loadAssets() {
+      await db.init();
+      allAssets = await db.getAllAssets();
+      renderAssets(allAssets);
+    }
+
+    function renderAssets(assets) {
+      const container = document.getElementById('assetsContainer');
+      container.innerHTML = '';
+
+      if (assets.length === 0) {
+        container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 50px 0;">No saved assets found in local storage library.</div>`;
+        return;
+      }
+
+      assets.forEach(asset => {
+        const card = document.createElement('div');
+        card.className = 'asset-card';
+
+        const createdDate = asset.createdAt ? new Date(asset.createdAt).toLocaleDateString() : 'Recent';
+
+        card.innerHTML = `
+          <span class="asset-type-badge">${asset.type.replace('_', ' ')}</span>
+          <div class="asset-title" title="${asset.name}">${asset.name}</div>
+          <div class="asset-date">Saved on ${createdDate}</div>
+          <div class="card-actions">
+            <button class="btn" onclick="openAssetModal('${asset.id}')">👁 View / Export</button>
+            <button class="btn btn-danger" onclick="deleteAsset('${asset.id}')">🗑</button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function filterAssets() {
+      const filter = document.getElementById('typeFilter').value;
+      if (filter === 'ALL') {
+        renderAssets(allAssets);
+      } else {
+        renderAssets(allAssets.filter(a => a.type === filter));
+      }
+    }
+
+    function openAssetModal(id) {
+      const asset = allAssets.find(a => a.id === id);
+      if (!asset) return;
+
+      document.getElementById('modalTitle').textContent = asset.name;
+      const modalBody = document.getElementById('modalBody');
+
+      if (asset.type === 'image') {
+        modalBody.innerHTML = `<img src="${asset.data}" style="max-width: 100%; border-radius: 8px; display: block; margin: 0 auto;">`;
+      } else {
+        modalBody.textContent = asset.data;
+      }
+
+      document.getElementById('downloadBtn').onclick = () => exportAsset(asset);
+      document.getElementById('viewModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('viewModal').style.display = 'none';
+    }
+
+    function exportAsset(asset) {
+      const blob = new Blob([asset.data], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${asset.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
+      a.click();
+    }
+
+    async function deleteAsset(id) {
+      if (confirm("Delete this asset from storage?")) {
+        await db.deleteAsset(id);
+        await loadAssets();
+      }
+    }
+
+    async function clearAllAssets() {
+      if (confirm("Are you sure you want to clear your entire local assets database?")) {
+        await db.clearAssets();
+        await loadAssets();
+      }
+    }
+
+    window.onload = loadAssets;
+  </script>
+</body>
+</html>
